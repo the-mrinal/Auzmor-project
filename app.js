@@ -35,6 +35,7 @@ function verifytoken(req,res,next){
                       return next(err)
                     }
                     else if(resp.rows[0].auth_id==authData.password){
+                        req.authData = resp.rows[0];
                         next();
                     }else{
                         res.sendStatus(403);
