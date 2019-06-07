@@ -1,10 +1,9 @@
 const express = require('express');
 const app = express();
+const inbound = require('./api/routes/inbound');
+const outbound = require('./api/routes/outbound');
 
-app.use((req,res,nxt)=>{
-    res.status(200).json({
-        message:"looks cool"
-    });
-});
+app.use('/inbound',inbound);
+app.use('/outbound',outbound);
 
 module.exports = app;
