@@ -1,0 +1,14 @@
+{
+  "name": "nodejs-api",
+  "version": "1.0.0",
+  "description": "a project to create nodejs api using postgres sql",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mrinal",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
