@@ -1,43 +1,50 @@
+
+//importing required node modules
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser')
 const app = express();
 
-const databaseCheck = require('./api/routes/databasecheck');
+//importing required myown defined modules
 const inbound = require('./api/routes/inbound');
 const outbound = require('./api/routes/outbound');
 const auth = require('./api/routes/auth');
-
 const db = require('./db');
+
 // Tell express to use the body-parser middleware and to not parse extended bodies
 app.use(bodyParser.urlencoded({ extended: false }))
+//these app.use for the routes to redirect to specific place
 app.use('/inbound',verifytoken,inbound);
 app.use('/outbound',verifytoken,outbound);
 app.use('/login',auth);
-app.use('/data',databaseCheck);
 
-//verify token
+
+//verify token authentication
 function verifytoken(req,res,next){
     //get header val
     const headerVal = req.headers['authorization'];
 
-    //cehck if undef
+    //cehck if undef that means no authorisation
     if(typeof headerVal !== 'undefined' ){
         const val = headerVal.split(' ');
         const token = val[0];
         req.token = token;
         jwt.verify(req.token,'secretkey',(err,authData)=>{
+            // get the data from jwt tokens and match from databse table account
             if(err){
                 console.log(err,authData);
             }else{
                 db.query("SELECT * from account where username=$1",[authData.username], (err, resp) => {
-                    if (err) {
-                      return next(err)
+                    //quesy the db to check
+                    if (err) {//some error while quering
+                        res.sendStatus(405);
                     }
                     else if(resp.rows[0].auth_id==authData.password){
+                        //data fetched and match success
                         req.authData = resp.rows[0];
                         next();
                     }else{
+                        //match failed wrong token
                         res.sendStatus(403);
                     }
                 })
@@ -45,6 +52,7 @@ function verifytoken(req,res,next){
         });
     }else{
         //nooooo
+        //when no authorisation header is set
         res.sendStatus(403);
     }
 }

@@ -1,11 +1,19 @@
+//importing required node modules
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
+const redis = require('redis');
 
+//setting up redis port
+const REDIS_PORT = process.env.REDIS_PORT || 6379;
+const redis_client = redis.createClient(REDIS_PORT);
+//importing required myown defined modules
 const db = require('../../db');
 
-router.post('/sms',validation,(req,res,next)=>{
+
+router.post('/sms',validation,cache,(req,res,next)=>{
             if(req.status == 0){
+                //if 0 that means the middleware function returns the result as error
                 res.status(403).json(req.statusMsg);
             }else{
                 res.status(200).json({
@@ -16,8 +24,9 @@ router.post('/sms',validation,(req,res,next)=>{
 });
 
 function validation(req,res,next){
-    var status =1;
-    var msg= [];
+    //this function is used for all the validation stuff
+    var status =1;//set the status as 1 will change it to 0 if any validation fails
+    var msg= [];//initilise for the error msgs
     if(typeof req.body.to === "undefined"){
         //parameter missing
         status =0;
@@ -33,6 +42,7 @@ function validation(req,res,next){
     }
     if(typeof req.body.from === "undefined"){
         //parameter missing
+            //min 6 max 16 for to and from
         status =0;
         msg.push({error: "from is missing"});
     }
@@ -41,6 +51,7 @@ function validation(req,res,next){
             
         if((from.length>16 && from.length <6)){
             //parameter invalid
+                //min 6 max 16 for to and from
             status =0;
             msg.push({error: "from is invalid"});
         }
@@ -58,20 +69,24 @@ function validation(req,res,next){
             msg.push({error: "msg is invalid"});
         }
     }
-    //min 6 max 16 for to and from
 
 
 
+    //check the to number and authData.id 
+    //make sure the sms reached to the person intented to
     db.query("SELECT * from phone_number where number=$1 and account_id=$2",[to,req.authData.id], (err, resp) => {
         if (err) {
           return next(err)
         }
         else if(resp.rows.length !=0){
+            //true
+            //matched the account and to number
             req.status = status;
             req.statusMsg = msg;
             next();
         }else{
             //parameter not found
+            //false
             status =0;
             msg.push({error: "to parameter not found"});
             req.status = status;
@@ -80,5 +95,14 @@ function validation(req,res,next){
         }
     });
 }
-
+function cache(req,res,next){
+    //cache set here
+    var msg = req.body.text;
+    if(msg.replace(/[\n\t\r]/g,"")=="STOP"){ //trims and checks all condition of stop mentioned
+        //set the from to key pair in here for 4 hours
+        redis_client.setex(req.body.from,14400, req.body.to);
+        console.log('saved');
+    }
+    next();
+}
 module.exports = router;
