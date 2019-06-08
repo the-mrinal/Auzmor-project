@@ -36,22 +36,26 @@ function verifytoken(req,res,next){
                 const val = headerVal.split(' ');
                 const token = val[0];
                 req.token = token;
+                console.log(token);
                 jwt.verify(req.token,'secretkey',(err,authData)=>{
                     // get the data from jwt tokens and match from databse table account
                     if(err){
+                        console.log(err)
                         res.sendStatus(403);
                     }else{
                         db.query("SELECT * from account where username=$1",[authData.username], (err, resp) => {
                             //quesy the db to check
                             if (err) {//some error while quering
+                         
                                 res.sendStatus(405);
                             }
-                            else if(resp.rows[0].auth_id==authData.password){
+                            else if(resp.rows[0].auth_id==authData.password){//
                                 //data fetched and match success
                                 req.authData = resp.rows[0];
                                 next();
                             }else{
                                 //match failed wrong token
+                           
                                 res.sendStatus(403);
                             }
                         })
@@ -60,6 +64,7 @@ function verifytoken(req,res,next){
             }else{
                 //nooooo
                 //when no authorisation header is set
+                console.log("no header!")
                 res.sendStatus(403);
             }
     }else{
