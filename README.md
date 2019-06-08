@@ -9,7 +9,7 @@ we added a third API endpoint :
 using this user can login by his username and auth_id / password
 and then a token is generated.
 The user should use that token(as headers) to verify its identity while making each API Calls :
->    Key                :Value
+
 > Authorization : <  token value >
 
 **API Endpoints**
