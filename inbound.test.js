@@ -2,6 +2,7 @@ const request = require('supertest');
 const app = require('./app')
 
 
+
 //testing all the possible cases
 describe('Test the get method', () => {
     test('It should response the with the status code 405 ', (done) => {
@@ -17,6 +18,7 @@ describe('Test the get method', () => {
 });
 
 
+
 describe('Test the /inbound/sms when the all parameter sent and are correct', () => {
     test('It should response the with the status code 200 and it should respond with inbound sms ok', (done) => {
         request(app).post('/inbound/sms')
@@ -25,7 +27,7 @@ describe('Test the /inbound/sms when the all parameter sent and are correct', ()
         .send({
             from:"343456789",
             to:"16052299352",
-            text:"hello"
+            text:"STOP"//for redis testing
         }) 
         .then((response) => {
             console.log(response.body);

@@ -124,7 +124,7 @@ function cache(req,res,next){
             if (data != null && data > 50) {
                 //is thats greater than 50 limit crossed!!!
                 msg = {error:"limit is reached from "+from}
-                req.status = 0;
+                req.Msgstatus = 0;
                 req.statusMsg = msg;
 
             } else if(data != null && data <=50) {
@@ -144,10 +144,10 @@ function cache(req,res,next){
             if (data != null && data == from) {
                 //data is prese and the to from pair both matched
                 //blocked then
-                console.log(data);
+                console.log("blocked"+data);
                 msg = {error:"sms from "+from+" to "+to+" is blocked by STOP request."}
-                req.status = 0;
-                req.statusMsg = msg;
+                req.Msgstatus = 0;
+                req.statusMsg = [msg];
                 next();
             } else {
                 //not blocked

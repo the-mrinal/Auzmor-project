@@ -113,6 +113,7 @@ function validation(req,res,next){
 function cache(req,res,next){
     //cache set here
     if(req.Msgstatus ==1){
+        
         var msg = req.body.text;
         if(msg.replace(/[\n\t\r]/g,"")=="STOP"){ //trims and checks all condition of stop mentioned
             //set the from to key pair in here for 4 hours
