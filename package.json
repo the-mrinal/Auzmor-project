@@ -4,14 +4,23 @@
   "description": "a project to create nodejs api using postgres sql",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "mrinal",
   "license": "ISC",
   "dependencies": {
+    "assert": "^2.0.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "pg": "^7.11.0",
     "redis": "^2.8.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "jest": "^24.8.0",
+    "superagent": "^5.0.6",
+    "supertest": "^4.0.2",
+    "supertest-as-promised": "^4.0.2"
   }
 }
