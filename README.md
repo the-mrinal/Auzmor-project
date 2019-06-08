@@ -80,4 +80,8 @@ You can also check it on POSTMAN by running node.js server
 	Auzmor-project/> node server.js
 	
 And then Go to postman call the API's with correct parameters.
+
+## Known Bugs
+
+- If the `npm test` command doesn't pass all test-cases in first run due to async await timeout error! Run again it'll pass.
 		
