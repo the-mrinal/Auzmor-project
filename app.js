@@ -17,9 +17,7 @@ app.use(bodyParser.urlencoded({
  app.use(bodyParser.json());
 //these app.use for the routes to redirect to specific place
 app.use('/inbound',verifytoken,inbound);
-// app.use('/inbound/sms',error);
 app.use('/outbound',verifytoken,outbound);
-// app.use('/outbound/sms',error);
 app.use('/login',auth);
 
 //verify token authentication
@@ -62,12 +60,13 @@ function verifytoken(req,res,next){
                     }
                 });
             }else{
-                //nooooo
+          
                 //when no authorisation header is set
                 console.log("no header!")
                 res.sendStatus(403);
             }
     }else{
+        //other than post method
         res.sendStatus(405);
     }
 }

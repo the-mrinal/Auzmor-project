@@ -2,11 +2,11 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
-// const redis = require('redis');
+const redis = require('redis');
 const app = express();
 //setting up redis port
-// const REDIS_PORT = process.env.REDIS_PORT || 6379;
-// const redis_client = redis.createClient(REDIS_PORT);
+const REDIS_PORT = process.env.REDIS_PORT || 6379;
+const redis_client = redis.createClient(REDIS_PORT);
 //importing required myown defined modules
 const db = require('../../db');
 
@@ -117,7 +117,7 @@ function cache(req,res,next){
         var msg = req.body.text;
         if(msg.replace(/[\n\t\r]/g,"")=="STOP"){ //trims and checks all condition of stop mentioned
             //set the from to key pair in here for 4 hours
-            // redis_client.setex(req.body.from,14400, req.body.to);
+            redis_client.setex(req.body.from,14400, req.body.to);
             console.log('saved');
         }
     }

@@ -2,10 +2,10 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
-// const redis = require('redis');
+const redis = require('redis');
 //setting up redis port
-// const REDIS_PORT = process.env.REDIS_PORT || 6379;
-// const redis_client = redis.createClient(REDIS_PORT);
+const REDIS_PORT = process.env.REDIS_PORT || 6379;
+const redis_client = redis.createClient(REDIS_PORT);
 
 //importing required myown defined modules
 const db = require('../../db');
@@ -117,44 +117,43 @@ function cache(req,res,next){
         var to = req.body.to;
         var from = req.body.from;
         var msg = [];
-        // redis_client.get(from, function (err, data) {
-        //     //to check api call limit of from number 
-        //     if (err) throw err;
+        redis_client.get(from, function (err, data) {
+            //to check api call limit of from number 
+            if (err) throw err;
 
-        //     if (data != null && data > 50) {
-        //         //is thats greater than 50 limit crossed!!!
-        //         msg = {error:"limit is reached from "+from}
-        //         req.Msgstatus = 0;
-        //         req.statusMsg = msg;
+            if (data != null && data > 50) {
+                //is thats greater than 50 limit crossed!!!
+                msg = {error:"limit is reached from "+from}
+                req.Msgstatus = 0;
+                req.statusMsg = msg;
 
-        //     } else if(data != null && data <=50) {
-        //         //not greater than 50
-        //         redis_client.INCR(from);
+            } else if(data != null && data <=50) {
+                //not greater than 50
+                redis_client.INCR(from);
 
-        //     }else{
-        //         //first time 
-        //         //set 24hr timer
-        //         redis_client.setex(from, 86400, 1);
-        //     }
-        // });
-        // redis_client.get(to, function (err, data) {
-        //     //checking to and from pair in the blocklist
-        //     if (err) throw err;
+            }else{
+                //first time 
+                //set 24hr timer
+                redis_client.setex(from, 86400, 1);
+            }
+        });
+        redis_client.get(to, function (err, data) {
+            //checking to and from pair in the blocklist
+            if (err) throw err;
 
-        //     if (data != null && data == from) {
-        //         //data is prese and the to from pair both matched
-        //         //blocked then
-        //         console.log("blocked"+data);
-        //         msg = {error:"sms from "+from+" to "+to+" is blocked by STOP request."}
-        //         req.Msgstatus = 0;
-        //         req.statusMsg = [msg];
-        //         next();
-        //     } else {
-        //         //not blocked
-        //         next();
-        //     }
-        // });
-        next();//just for heroku
+            if (data != null && data == from) {
+                //data is prese and the to from pair both matched
+                //blocked then
+                console.log("blocked"+data);
+                msg = {error:"sms from "+from+" to "+to+" is blocked by STOP request."}
+                req.Msgstatus = 0;
+                req.statusMsg = [msg];
+                next();
+            } else {
+                //not blocked
+                next();
+            }
+        });
     }else{
         next();
     }
