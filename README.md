@@ -1,6 +1,6 @@
 # Backend Server Assignment
 
-I made this project using `'node.js'` .In this project there are two API endpoints.
+I made this project using `'node.js'` `redis` `jest` .In this project there are two API endpoints.
 
 **Authorization**
 As we need to make sure the user of these API are verified and authenticated 
