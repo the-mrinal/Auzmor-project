@@ -34,7 +34,7 @@ function verifytoken(req,res,next){
                 const val = headerVal.split(' ');
                 const token = val[0];
                 req.token = token;
-                console.log(token);
+             
                 jwt.verify(req.token,'secretkey',(err,authData)=>{
                     // get the data from jwt tokens and match from databse table account
                     if(err){
