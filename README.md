@@ -61,8 +61,6 @@ if the response is coming something like `Redis server v=5.*.* sha=*** malloc=**
 >
 	/>cd Auzmor-project
 >
-	Auzmor-project/>npm init
->
 	Auzmor-project/>npm install
 >this command will install all the package required to run this project
 
