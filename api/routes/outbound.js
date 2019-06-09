@@ -117,26 +117,28 @@ function cache(req,res,next){
         var to = req.body.to;
         var from = req.body.from;
         var msg = [];
-        redis_client.get(from, function (err, data) {
-            //to check api call limit of from number 
-            if (err) throw err;
-
-            if (data != null && data > 50) {
-                //is thats greater than 50 limit crossed!!!
-                msg = {error:"limit is reached from "+from}
+        
+         //rate limiter function using redis
+        const token = from 
+        // get the unique identifier from the user here
+        redis_client
+            .multi() // starting a transaction
+            // Set a redis key (token) with value 0 if it doesnt exist already and expiry as 60sec
+            .set([token, 0, 'EX', 86400, 'NX']) // SET UUID 0 EX 60 NX
+            .incr(token) // INCR tokrn
+            .exec((err, replies) => {
+            if (err) {
+                return res.status(500).send(err.message)
+            }
+            const reqCount = replies[1]
+            if (reqCount > 50) { //if limit reached
+                msg = {error:"limit reached for from "+from}
                 req.Msgstatus = 0;
-                req.statusMsg = msg;
-
-            } else if(data != null && data <=50) {
-                //not greater than 50
-                redis_client.INCR(from);
-
-            }else{
-                //first time 
-                //set 24hr timer
-                redis_client.setex(from, 86400, 1);
+                req.statusMsg = [msg];
+                next();
             }
         });
+        
         redis_client.get(to, function (err, data) {
             //checking to and from pair in the blocklist
             if (err) throw err;
